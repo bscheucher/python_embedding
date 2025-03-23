@@ -1,7 +1,11 @@
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_chroma import Chroma
 from langchain.chains import RetrievalQA
+from redundant_filter_retriever import RedundantFilterRetriever
+from langchain.globals import set_verbose
 from dotenv import load_dotenv
+
+set_verbose(True)
 
 load_dotenv()
 
@@ -11,7 +15,10 @@ db = Chroma(
     persist_directory="emb",
     embedding_function=embeddings
 )
-retriever = db.as_retriever()
+retriever = RedundantFilterRetriever(
+    embeddings=embeddings,
+    chroma=db
+)
 
 chain = RetrievalQA.from_chain_type(
     llm=chat,
